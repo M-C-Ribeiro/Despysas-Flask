@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Formulário de Cadastro
+{% endblock %}
+
+{% block content %}
+<body class="text-center">
+    <div class="container">
+        <h2 style="text-align: center;">Cadastro do Usuário</h2>
+        <hr>
+        <form method="POST" class="form-register" style="color: #736222;">
+            {{ form.hidden_tag() }}
+
+            {{ form.usuario.label() }}
+            {{ form.usuario(class="form-control", placeholder="Informe o Usuário")}}
+
+            {{ form.email.label() }}
+            {{ form.email(class="form-control", placeholder="Informe o E-mail")}}
+            
+            {{ form.senha1.label() }}
+            {{ form.senha1(class="form-control", placeholder="Informe a senha")}}
+            
+            {{ form.senha2.label() }}
+            {{ form.senha2(class="form-control", placeholder="Confirme a senha")}}
+            
+            <div class="d-grid" style="padding-top: 50px;">
+                {{ form.submit(class="btn btn-md btn-light")}}
+            </div>
+        </form>
+    </div>
+</body>
+{% endblock %}

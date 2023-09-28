@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Dashboard
+{% endblock %}
+
+{% block content %}
+    <h2 style="text-align: center;">Planilhas</h2>
+    <hr>
+    <div class="row" style="max-width: 100%;">
+        <div class="col-sm-6">
+            <h4 style="margin-left: 10px;">Seu Capital</h4>
+            <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 60px;">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Valor</th>
+                </thead>  
+                <tbody>
+                    {% for item in capital %}
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.nome}}</td>
+                        <td>{{item.valor}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-6">
+            <h4 style="margin-left: 10px;">Suas Despesas</h4>
+            <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 60px;">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Categoria</th>
+                </thead>  
+                <tbody>
+                    {% for item in despesa %}
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.nome}}</td>
+                        <td>{{item.valor}}</td>
+                        <td>{{item.descricao}}</td>
+                        <td>{{item.categoria}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
