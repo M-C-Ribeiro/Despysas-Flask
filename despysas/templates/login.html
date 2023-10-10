@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Despysas
+{% endblock %}
+
+{% block content %}
+<body class="text-center">
+    <div class="container">
+        <h1 class="h3 mb-3 font-weight-normal">
+            Por favor, faça login
+        </h1>
+        <form method="POST" class="form-signin" style="color: whitesmoke;">
+            {{ form.hidden_tag() }}
+
+            {{ form.usuario.label() }}
+            {{ form.usuario(class="form-control", placeholder="Informe o usuário:")}}
+
+            {{ form.senha.label() }}
+            {{ form.senha(class="form-control", placeholder="Informe a senha:")}}
+            
+            <div class="checkbox mb-3" style="padding-top: 2px;">
+                <h5>Você não possui cadastro?</h5>
+                <a href="{{url_for('page_cadastro')}}" class="btn btn-sm btn-secondary">Cadastre-se</a>
+            </div>
+            
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-md btn-light")}}
+            </div>
+        </form>
+    </div>
+</body>
+<style>
+    .btn-secondary {
+        background-color: rgba(150, 0, 0, 0.55);
+    }
+</style>
+{% endblock %}

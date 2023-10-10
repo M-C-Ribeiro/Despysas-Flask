@@ -19,20 +19,21 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav me-auto">
-              <a class="nav-link active" aria-current="page" href="http://127.0.0.1:5000/">Dashboard</a>
-              <a class="nav-link" href="http://127.0.0.1:5000/table">Planilhas</a>
-              <a class="nav-link" href="#">Investimentos</a>
+              <a class="nav-link active" aria-current="page" href="{{url_for('page_dashboard')}}">Dashboard</a>
+              <a class="nav-link" href="{{url_for('page_table')}}">Planilhas</a>
+              <a class="nav-link" href="{{url_for('page_investimentos')}}">Investimentos</a>
             </div>
             <div class="navbar-nav ms-auto">
               <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Cadastros</a>
                 <div class="dropdown-menu m-0">
-                    <a href="http://127.0.0.1:5000/cadastro" class="dropdown-item">Usuário</a>
-                    <a href="http://127.0.0.1:5000/cadastro_capital" class="dropdown-item">Cadastrar Entrada</a>
-                    <a href="http://127.0.0.1:5000/cadastro_despesa" class="dropdown-item">Cadastrar Despesa</a>
+                    <a href="{{url_for('page_cadastro')}}" class="dropdown-item">Usuário</a>
+                    <a href="{{url_for('page_cadastro_capital')}}" class="dropdown-item">Cadastrar Entrada</a>
+                    <a href="{{url_for('page_cadastro_despesa')}}" class="dropdown-item">Cadastrar Despesa</a>
                 </div>
               </div>
-              <a class="nav-link" href="http://127.0.0.1:5000/user">Perfil</a>
+              <a class="nav-link" href="{{url_for('page_user')}}">Perfil</a>
+              <a class="nav-link" href="{{url_for('page_login')}}">Login</a>
             </div>
           </div>
         </div>

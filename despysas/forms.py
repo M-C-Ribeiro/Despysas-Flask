@@ -33,3 +33,8 @@ class CadastroFormDespesa(FlaskForm):
     descricao = StringField(label="Descrição", validators=[Length(max=500)])
     categoria = IntegerField(label="ID da Categoria")
     submit = SubmitField(label="Cadastrar")
+
+class LoginForm(FlaskForm):
+    usuario = StringField(label="Usuário:", validators=[DataRequired()])
+    senha = PasswordField(label="Senha:", validators=[DataRequired()])
+    submit = SubmitField(label="Log In")

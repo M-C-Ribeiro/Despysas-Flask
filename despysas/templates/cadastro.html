@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Formulário de Cadastro
+    Despysas
 {% endblock %}
 
 {% block content %}
@@ -27,7 +27,17 @@
             <div class="d-grid" style="padding-top: 50px;">
                 {{ form.submit(class="btn btn-md btn-light")}}
             </div>
+
+            <div class="checkbox mb-3" style="padding-top: 2px;">
+                <h5>Você já possui cadastro?</h5>
+                <a href="{{url_for('page_login')}}" class="btn btn-sm btn-secondary">Faça Log In</a>
+            </div>
         </form>
     </div>
 </body>
 {% endblock %}
+<style>
+    .btn-secondary {
+        background-color: rgba(150, 0, 0, 0.55);
+    }
+</style>
