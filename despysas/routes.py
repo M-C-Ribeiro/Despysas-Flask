@@ -11,30 +11,35 @@ import plotly.express as px
 def page_dashboard():
 
     # --------------- transformando as tabelas em dataframes ---------------
+    
     categorias = db.session.query(Categorias.id, Categorias.nome, Categorias.descricao, Categorias.despesas).all() # buscando os valores
     df_categorias = pd.DataFrame(categorias, columns=["id", "nome", "descricao","despesa"]) # criando o dataframe
 
     capitais = db.session.query(Capitais.id, Capitais.nome, Capitais.valor, Capitais.data).all() # buscando os valores
     df_capitais = pd.DataFrame(capitais, columns=["id", "nome", "valor", "data_capitais"]) # criando o dataframe
-    df_capitais['data_capitais'] = pd.to_datetime(df_capitais['data_capitais'])
+    df_capitais['data_capitais'] = pd.to_datetime(df_capitais['data_capitais']) # converte o valor da coluna para um atributo válido, datetime
+    df_capitais['mes'] = df_capitais['data_capitais'].dt.month
 
     despesas = db.session.query(Despesas.id, Despesas.nome, Despesas.valor, Despesas.descricao, Despesas.categoria, Despesas.data).all() # buscando os valores
-    df_despesas = pd.DataFrame(despesas, columns=["id", "nome", "valor", "descricao", "categoria", "data_despesa"])
-    df_despesas['data_despesa'] = pd.to_datetime(df_despesas['data_despesa'])
+    df_despesas = pd.DataFrame(despesas, columns=["id", "nome", "valor", "descricao", "categoria", "data_despesa"]) # criando o dataframe
+    df_despesas['data_despesa'] = pd.to_datetime(df_despesas['data_despesa']) # converte o valor da coluna para um atributo válido, datetime
+    df_despesas['mes'] = df_despesas['data_despesa'].dt.month
 
-    df_completo = pd.merge(df_despesas, df_categorias, how="right", left_on='categoria', right_on='id', suffixes=('_despesa', '_categoria'))
-    df_completo.drop_duplicates(subset="id_despesa")
-    # Extrair o mês da data e adicionar como uma nova coluna no DataFrame
+    df_completo = pd.merge(df_despesas, df_categorias, how="right", left_on='categoria', right_on='id', suffixes=('_despesa', '_categoria')) 
     df_completo['mes'] = df_completo['data_despesa'].dt.month
     df_completo = df_completo.loc[df_completo["despesa"]]
 
-    # Criar o gráfico Plotly Express
+    df_novo = pd.merge(df_despesas, df_capitais, on='mes', how='inner', suffixes=('_capital', '_despesa')).drop_duplicates(subset="id_despesa")
+    print(df_novo)
+
+
+
+    # --------------- gráfico gastos por categoria ---------------
     fig = px.bar(df_completo, x='nome_categoria', y='valor', color='nome_categoria',
                 labels={'valor': 'Valor', 'mes': 'Mês', 'nome_categoria': 'Categoria'},
-                title='Valores por Categoria').update_layout(width=400, height=400)
-    
+                title='Valores por Categoria').update_layout(width=500, height=500)
 
-    # Converter o gráfico Plotly para HTML
+
     figura_gastos_categoria = fig.to_html(full_html=False)
 
 
@@ -43,11 +48,13 @@ def page_dashboard():
     df_capitais['mes'] = df_capitais['data_capitais'].dt.month
     fig = px.bar(df_capitais, x='mes', y='valor',color='mes', 
                  labels={'valor': 'Valor', 'mes': 'Mês'}, 
-                 title='Valores por Mês').update_layout(width=400, height=400)
+                 title='Valores por Mês').update_layout(width=500, height=500)
 
     entrada_mes = fig.to_html(full_html=False)
 
     return render_template("dashboard.html", figura_gastos_categoria=figura_gastos_categoria, entrada_mes=entrada_mes) 
+
+    # --------------- crescimento dos gastos e dos lucros ---------------
 
 @app.route('/table') # decorator rota table
 def page_table():
