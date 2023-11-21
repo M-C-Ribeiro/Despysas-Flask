@@ -24,16 +24,27 @@
               <a class="nav-link" href="{{url_for('page_investimentos')}}">Investimentos</a>
             </div>
             <div class="navbar-nav ms-auto">
-              <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Cadastros</a>
-                <div class="dropdown-menu m-0">
-                    <a href="{{url_for('page_cadastro')}}" class="dropdown-item">Usuário</a>
+              
+              {% if current_user.is_authenticated %}
+              <div class="navbar-nav">
+                <div class="nav-item dropdown">
+                  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Cadastros</a>
+                  <div class="dropdown-menu m-0">
+                    <a href="{{url_for('page_cadastro_categoria')}}" class="dropdown-item">Cadastrar Categoria</a>
                     <a href="{{url_for('page_cadastro_capital')}}" class="dropdown-item">Cadastrar Entrada</a>
                     <a href="{{url_for('page_cadastro_despesa')}}" class="dropdown-item">Cadastrar Despesa</a>
+                  </div>
                 </div>
+                <a class="nav-link" href="{{url_for('page_user')}}">Perfil</a>
+                <a class="nav-link" href="{{url_for('page_logout')}}">Sair</a>
+
               </div>
-              <a class="nav-link" href="{{url_for('page_user')}}">Perfil</a>
-              <a class="nav-link" href="{{url_for('page_login')}}">Login</a>
+              {% else %}
+              <div class="navbar-nav">
+                <a class="nav-link" href="{{url_for('page_login')}}">Login</a>
+              </div>
+              {% endif %}
+              
             </div>
           </div>
         </div>

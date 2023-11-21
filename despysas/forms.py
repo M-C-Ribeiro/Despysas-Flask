@@ -1,8 +1,9 @@
+from flask import flash
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, IntegerField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, IntegerField, FloatField, SelectField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError 
-from despysas.models import Users
-    
+from despysas.models import Users, Categorias
+
 class CadastroFormUsuario(FlaskForm):
     def validate_username(self, check_user):
         user = Users.query.filter_by(usuario=check_user.data).first()
@@ -22,16 +23,22 @@ class CadastroFormUsuario(FlaskForm):
 
 class CadastroFormCapital(FlaskForm):
     # Nao necessita validacao maior, devido a nao serem valores unicos
-    nome = StringField(label="Título", validators=[Length(max=30)])
-    valor = FloatField(label="Valor")
+    nome = StringField(label="Título", validators=[Length(max=30), DataRequired()])
+    valor = FloatField(label="Valor", validators=[DataRequired()])
     submit = SubmitField(label="Cadastrar")
 
 class CadastroFormDespesa(FlaskForm):
     # Nao necessita validacao maior, devido a nao serem valores unicos
-    nome = StringField(label="Título", validators=[Length(max=30)])
-    valor = FloatField(label="Valor")
-    descricao = StringField(label="Descrição", validators=[Length(max=500)])
-    categoria = IntegerField(label="ID da Categoria")
+    nome = StringField(label="Título", validators=[Length(max=30), DataRequired()])
+    valor = FloatField(label="Valor", validators=[DataRequired()])
+    descricao = StringField(label="Descrição", validators=[Length(max=500), DataRequired()])
+
+    categoria = SelectField(label="Selecione a Categoria", choices=[], validators=[DataRequired()])
+    submit = SubmitField(label="Cadastrar")
+
+class CadastroFormCategoria(FlaskForm):
+    nome = StringField(label="Título", validators=[Length(max=30), DataRequired()])
+    descricao = StringField(label="Descrição", validators=[Length(max=500), DataRequired()])
     submit = SubmitField(label="Cadastrar")
 
 class LoginForm(FlaskForm):

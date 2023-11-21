@@ -8,7 +8,7 @@
     <h2 style="text-align: center;">Cadastro de Despesa</h2>
     <hr>
     <div class="container">
-        <form method="POST" class="form-register" style="color: #736222;">
+        <form method="POST" class="form-register" id="CadastroFormDespesa" style="color: #736222;">
             {{ form.hidden_tag() }}
             
             {{ form.nome.label() }}
@@ -21,11 +21,22 @@
             {{ form.descricao(class="form-control", placeholder="Informe a descrição")}}
             
             {{ form.categoria.label() }}
-            {{ form.categoria(class="form-control", placeholder="Informe a categoria")}}
+            {{ form.categoria(class="form-control", id="categoria")}}
+
+            <div class="checkbox mb-3" style="padding-top: 2px; color: whitesmoke;">
+                <h5>Não encontrou a categoria desejada?</h5>
+                <a href="{{url_for('page_cadastro_categoria')}}" class="btn btn-sm btn-secondary">Cadastre</a>
+            </div>
             
             <div class="d-grid" style="padding-top: 50px;">
                 {{ form.submit(class="btn btn-md btn-light")}}
             </div>
         </form>
     </div>
+    
+<style>
+    .btn-secondary {
+        background-color: rgba(150, 0, 0, 0.55);
+    }
+</style>
 {% endblock %}

@@ -1,5 +1,6 @@
 from despysas import db, bcrypt, login_manager
 from flask_login import UserMixin
+from datetime import date
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -12,17 +13,19 @@ class Categorias(db.Model):
     descricao = db.Column(db.String(length=500), nullable=False)
     despesas = db.relationship('Despesas', backref='categoria_despesas', lazy=True)
      
+class Capitais(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(length=30), nullable=False)
+    valor = db.Column(db.Float, nullable=False)
+    data = db.Column(db.Date, default=date.today(), nullable=True)
+
 class Despesas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(length=30), nullable=False)
     valor = db.Column(db.Float, nullable=False)
     descricao = db.Column(db.String(length=500), nullable=False)
-    categoria = db.Column(db.Integer, db.ForeignKey('categorias.id'))
-
-class Capitais(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(length=30), nullable=False)
-    valor = db.Column(db.Float, nullable=False)
+    categoria = db.Column(db.Integer, db.ForeignKey('categorias.id'), nullable=False)
+    data = db.Column(db.Date, default=date.today(), nullable=True)
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

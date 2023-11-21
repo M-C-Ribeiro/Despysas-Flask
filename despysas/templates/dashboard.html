@@ -7,6 +7,9 @@
 {% block content %}
   <h2 style="text-align: center;">Dashboard</h2>
   <hr>
-  <div style="height: max-content;"></div>
+  <div class="nav-item" style="height: max-content; gap: 2cm; display: flex; justify-content: center; align-items: center; max-width: 100%; ">
+    {{ figura_gastos_categoria|safe }}
+    {{ entrada_mes|safe }}
+  </div>
 {% endblock %}
 
