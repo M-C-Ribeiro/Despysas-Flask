@@ -2,16 +2,16 @@ from despysas import app, db # aplicativo e banco de dados
 from flask import render_template, redirect, url_for, flash # modulos Flask
 from despysas.models import Categorias, Capitais, Despesas, Users # modelos das tabelas 
 from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, LoginForm # formularios para validacao
-from flask_login import login_user, logout_user
-import pandas as pd
-import plotly.express as px
-
+from flask_login import login_user, logout_user # controle do login do usuário
+import pandas as pd # criação de dashboards
+import plotly.express as px # plotagem de gráficos
+import requests, json
+from dash import Dash, dcc, html, Input, Output
 
 @app.route('/') # decorator rota raiz
 def page_dashboard():
 
     # --------------- transformando as tabelas em dataframes ---------------
-    
     categorias = db.session.query(Categorias.id, Categorias.nome, Categorias.descricao, Categorias.despesas).all() # buscando os valores
     df_categorias = pd.DataFrame(categorias, columns=["id", "nome", "descricao","despesa"]) # criando o dataframe
 
@@ -27,12 +27,10 @@ def page_dashboard():
 
     df_completo = pd.merge(df_despesas, df_categorias, how="right", left_on='categoria', right_on='id', suffixes=('_despesa', '_categoria')) 
     df_completo['mes'] = df_completo['data_despesa'].dt.month
-    df_completo = df_completo.loc[df_completo["despesa"]]
+    df_completo = df_completo.loc[df_completo["despesa"]].drop_duplicates(subset="id_despesa")
 
     df_novo = pd.merge(df_despesas, df_capitais, on='mes', how='inner', suffixes=('_capital', '_despesa')).drop_duplicates(subset="id_despesa")
     print(df_novo)
-
-
 
     # --------------- gráfico gastos por categoria ---------------
     fig = px.bar(df_completo, x='nome_categoria', y='valor', color='nome_categoria',
@@ -52,9 +50,14 @@ def page_dashboard():
 
     entrada_mes = fig.to_html(full_html=False)
 
-    return render_template("dashboard.html", figura_gastos_categoria=figura_gastos_categoria, entrada_mes=entrada_mes) 
 
     # --------------- crescimento dos gastos e dos lucros ---------------
+    # # df = pd.concat
+    # fig = px.scatter(df_novo, x="mes", y=["capital", "despesas"], title="Capitais e Despesas")
+    # capitais_despesa = fig.to_html(full_html=False)
+
+    return render_template("dashboard.html", figura_gastos_categoria=figura_gastos_categoria, entrada_mes=entrada_mes)#, capitais_despesa=capitais_despesa) 
+
 
 @app.route('/table') # decorator rota table
 def page_table():
@@ -163,4 +166,19 @@ def page_logout():
 
 @app.route('/investimentos')
 def page_investimentos():
-    return render_template('investimentos.html')
+
+    token = "v5y2BDgq6LykAjCHuubjBe"
+    dash_app = Dash()
+
+    url = f'https://brapi.dev/api/quote/list?sortBy=change&sortOrder=desc&limit=10&token={token}'
+    req = requests.get(url) # requisição
+    res = json.loads(req.text) #resposta
+    df = pd.DataFrame(res['stocks']).drop_duplicates(subset="name") # transformando a resposta em um dataframe
+
+    fig = px.bar(df, x="name", y="change",
+                 color="sector",
+                 labels={"name":"Ativo", "change":"Crescimento"}, 
+                 title="Ações com maior crescimento")
+    maior_crescimento = fig.to_html(full_html=False)
+
+    return render_template('investimentos.html', maior_crescimento=maior_crescimento)
