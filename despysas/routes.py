@@ -2,13 +2,15 @@ from despysas import app, db # aplicativo e banco de dados
 from flask import render_template, redirect, url_for, flash # modulos Flask
 from despysas.models import Categorias, Capitais, Despesas, Users # modelos das tabelas 
 from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, LoginForm # formularios para validacao
-from flask_login import login_user, logout_user # controle do login do usuário
+from flask_login import login_required, login_user, logout_user # controle do login do usuário
 import pandas as pd # criação de dashboards
 import plotly.express as px # plotagem de gráficos
 import requests, json
 from dash import Dash, dcc, html, Input, Output
+import plotly.graph_objects as go
 
 @app.route('/') # decorator rota raiz
+@login_required
 def page_dashboard():
 
     # --------------- transformando as tabelas em dataframes ---------------
@@ -60,6 +62,7 @@ def page_dashboard():
 
 
 @app.route('/table') # decorator rota table
+@login_required
 def page_table():
     capital = Capitais.query.all() # consulta em todas as linhas da tabela Capitais
     despesa = Despesas.query.all() # consulta em todas as linhas da tabela Despesas
@@ -181,4 +184,19 @@ def page_investimentos():
                  title="Ações com maior crescimento")
     maior_crescimento = fig.to_html(full_html=False)
 
-    return render_template('investimentos.html', maior_crescimento=maior_crescimento)
+
+    url = f'https://brapi.dev/api/v2/inflation?country=brazil&start=01/01/2022&end=01/01/2023&sortBy=date&sortOrder=asc&t'
+    req = requests.get(url)
+    res = json.loads(req.text)
+    df = pd.DataFrame(res['inflation'])
+    df['value'] = df['value'].astype(float)
+
+    print(df['value'].dtypes)
+    fig = px.line(df, x="date", y="value")
+    fig.update_layout(title="Taxa de Inflação Jan. 2022 à Jan. 2023")
+    fig.update_xaxes(title_text="Meses", showgrid=True, gridwidth=1, gridcolor='lightgray', showline=True, linewidth=1, linecolor='black')
+    fig.update_yaxes(title_text="Taxa", showgrid=True, gridwidth=1, gridcolor='lightgray', showline=True, linewidth=1, linecolor='black')
+    fig.add_trace(go.Scatter(x = df['date'], y = df['value']))
+    inflacao = fig.to_html(full_html=False)
+
+    return render_template('investimentos.html', maior_crescimento=maior_crescimento, inflacao=inflacao)

@@ -11,5 +11,7 @@ app.config["SECRET_KEY"] = "e45f77756f254708783c156b"
 db.init_app(app) # inicia o banco
 bcrypt = Bcrypt(app) # instancia a biblioteca com acesso ao aplicativo
 login_manager.init_app(app) # inicializa o login manager
+login_manager.login_view = "page_login"
+login_manager.login_message = "Por favor, faça login" 
 
 from despysas import routes
