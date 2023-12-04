@@ -173,6 +173,7 @@ def page_investimentos():
     token = "v5y2BDgq6LykAjCHuubjBe"
     dash_app = Dash()
 
+    # --------------- Gráfico de ações com maior crescimento ---------------
     url = f'https://brapi.dev/api/quote/list?sortBy=change&sortOrder=desc&limit=10&token={token}'
     req = requests.get(url) # requisição
     res = json.loads(req.text) #resposta
@@ -184,7 +185,7 @@ def page_investimentos():
                  title="Ações com maior crescimento")
     maior_crescimento = fig.to_html(full_html=False)
 
-
+    # --------------- Gráfico da taxa de inflação do Brasil ---------------
     url = f'https://brapi.dev/api/v2/inflation?country=brazil&start=01/01/2022&end=01/01/2023&sortBy=date&sortOrder=asc&t'
     req = requests.get(url)
     res = json.loads(req.text)
