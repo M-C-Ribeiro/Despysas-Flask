@@ -10,6 +10,11 @@
     <div class="row" style="max-width: 100%;">
         <div class="col-sm-6">
             <h4 style="margin-left: 10px;">Seu Capital</h4>
+            <form method="POST">
+                {{ form.meses.label() }}
+                {{ form.meses(class="form-control", placeholder="Selecione o mês") }}
+            </form>
+
             <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 60px;">
                 <thead>
                     <th scope="col">ID</th>
@@ -31,6 +36,8 @@
         </div>
         <div class="col-sm-6">
             <h4 style="margin-left: 10px;">Suas Despesas</h4>
+            {{ form.meses.label() }}
+            {{ form.meses(class="form-control", placeholder="Selecione o mês") }}
             <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 60px;">
                 <thead>
                     <th scope="col">ID</th>
@@ -51,6 +58,15 @@
                         <td>{{item.data}}</td>
                     </tr>
                     {% endfor %}
+
+                    <script>
+                        let seleciona_mes = document.getElementById('mes')
+
+                        seleciona_mes.onchange = function() {
+                            mes = seleciona_mes.value;
+                            alert(mes)
+                        }
+                    </script>
                 </tbody>
             </table>
         </div>

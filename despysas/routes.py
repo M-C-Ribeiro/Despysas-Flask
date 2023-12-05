@@ -1,7 +1,8 @@
 from despysas import app, db # aplicativo e banco de dados
-from flask import render_template, redirect, url_for, flash # modulos Flask
-from despysas.models import Categorias, Capitais, Despesas, Users # modelos das tabelas 
-from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, LoginForm # formularios para validacao
+from flask import flash, jsonify, redirect, render_template, request, url_for # modulos Flask
+from sqlalchemy import extract
+from despysas.models import Capitais, Categorias, Despesas, Users # modelos das tabelas 
+from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, LoginForm, TabelaFiltrada # formularios para validacao
 from flask_login import login_required, login_user, logout_user # controle do login do usuário
 import pandas as pd # criação de dashboards
 import plotly.express as px # plotagem de gráficos
@@ -32,7 +33,6 @@ def page_dashboard():
     df_completo = df_completo.loc[df_completo["despesa"]].drop_duplicates(subset="id_despesa")
 
     df_novo = pd.merge(df_despesas, df_capitais, on='mes', how='inner', suffixes=('_capital', '_despesa')).drop_duplicates(subset="id_despesa")
-    print(df_novo)
 
     # --------------- gráfico gastos por categoria ---------------
     fig = px.bar(df_completo, x='nome_categoria', y='valor', color='nome_categoria',
@@ -61,12 +61,42 @@ def page_dashboard():
     return render_template("dashboard.html", figura_gastos_categoria=figura_gastos_categoria, entrada_mes=entrada_mes)#, capitais_despesa=capitais_despesa) 
 
 
-@app.route('/table') # decorator rota table
+@app.route('/table', methods=['GET','POST']) # decorator rota table
 @login_required
 def page_table():
-    capital = Capitais.query.all() # consulta em todas as linhas da tabela Capitais
+    form = TabelaFiltrada()
+
+    if request.method == 'POST':
+        mes = Capitais.query.filter_by(meses=form.meses.data).first()   
+        print(mes)
+        capital = Capitais.query.filter(extract("month", Capitais.data) == mes).all() # consulta em todas as linhas da tabela Capitais
+        despesa = Despesas.query.all() # consulta em todas as linhas da tabela Despesas
+        return render_template("table.html", capital=capital, despesa=despesa, form=form) 
+
+    
+    capital = Capitais.query.all() # consulta em todas as linhas da tabela Capitais    
     despesa = Despesas.query.all() # consulta em todas as linhas da tabela Despesas
-    return render_template("table.html", capital=capital, despesa=despesa) # renderiza o arquivo table.html com os parametros
+
+
+    # lista = set([(mes.data.month) for mes in Capitais.query.all()]) # busca na
+    return render_template("table.html", capital=capital, despesa=despesa, form=form) # renderiza o arquivo table.html com os parametros
+
+@app.route('/filtro/<mes>')
+def filtro(mes):
+    linhas_filtradas = Capitais.query.filter_by(meses=mes).all()
+
+    lista_capitais = []
+
+    for capital in linhas_filtradas:
+        obj_capital = {}
+        obj_capital['id'] = capital.id
+        obj_capital['nome'] = capital.nome
+        obj_capital['valor'] = capital.valor
+
+        lista_capitais.append(obj_capital)
+
+    return jsonify({'capitais': lista_capitais})
+
 
 @app.route('/user') # decorator rota user
 def page_user():    

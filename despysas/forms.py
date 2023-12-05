@@ -4,6 +4,9 @@ from wtforms import StringField, PasswordField, SubmitField, IntegerField, Float
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError 
 from despysas.models import Users, Categorias
 
+class TabelaFiltrada(FlaskForm):
+    meses = SelectField('mes', choices=[(0, "Todos")] + [(1, "Janeiro"), (2,"Fevereiro"), (3,"Março"), (4,"Abril"), (5,"Maio"), (6,"Junho"), (7,"Julho"), (8,"Agosto"), (9,"Setembro"), (10,"Outubro"), (11,"Novembro"), (12,"Dezembro")], validators=[DataRequired()]) 
+
 class CadastroFormUsuario(FlaskForm):
     def validate_username(self, check_user):
         user = Users.query.filter_by(usuario=check_user.data).first()
