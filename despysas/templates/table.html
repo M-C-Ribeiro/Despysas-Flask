@@ -8,13 +8,45 @@
     <h2 style="text-align: center;">Extrato</h2>
     <hr>
     <div class="row" style="max-width: 100%;">
-        <div class="col-sm-6">
-            <h4 style="margin-left: 10px;">Seu Capital</h4>
-            <form method="POST">
+        <div class="col-sm-4" style="margin-left: 10 px;">
+            <h4 style="margin-left: 10px;">Selecione o mês</h4>
+            <form method="POST" class="formi">
                 {{ form.meses.label() }}
                 {{ form.meses(class="form-control", placeholder="Selecione o mês") }}
+                <input type="submit" value="Filtrar" class="btn btn-secondary" id="btnSub">
             </form>
+        </div>
+        <div class="col-sm-4" style="display: flex; justify-content: center; align-items: center;">
+            <div class="card text-center" style="width: 200px;">
+                <div class="card-header">
+                  Total de Capital
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item"> {{ entrada }}</li>
+                </ul>
+                <div class="card-header">
+                    Total de Despesas
+                  </div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item"> {{ saida }}</li>
+                  </ul>
+              </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card text-center" id="cardSaldo">
+                <div class="card-body">
+                    <h5 class="card-title">Saldo atual:</h5>
+                    <p class="card-text calc">{{ entrada - saida }}</p>
+                    <a href="{{url_for('page_dashboard')}}" class="btn btn-primary" id="bto">Ver Gráficos</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h4 style="margin-left: 10px; margin-top: 10px;">Seu Capital</h4>
             <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 60px;">
                 <thead>
                     <th scope="col">ID</th>
@@ -35,10 +67,8 @@
             </table>
         </div>
         <div class="col-sm-6">
-            <h4 style="margin-left: 10px;">Suas Despesas</h4>
-            {{ form.meses.label() }}
-            {{ form.meses(class="form-control", placeholder="Selecione o mês") }}
-            <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 60px;">
+            <h4 style="margin-left: 10px; margin-top: 10px;">Suas Despesas</h4>
+            <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 55px;">
                 <thead>
                     <th scope="col">ID</th>
                     <th scope="col">Nome</th>
@@ -59,16 +89,58 @@
                     </tr>
                     {% endfor %}
 
-                    <script>
-                        let seleciona_mes = document.getElementById('mes')
-
-                        seleciona_mes.onchange = function() {
-                            mes = seleciona_mes.value;
-                            alert(mes)
-                        }
-                    </script>
                 </tbody>
             </table>
         </div>
     </div>
+
+{% if entrada - saida > 0 %}
+    <style>
+        .calc {
+            color: rgb(154, 229, 41);
+            font-weight: bolder;
+            font-size: larger;
+        }
+        #bto, #btnSub {
+            background-color: rgb(154, 229, 41);
+        }
+        #cardSaldo, #btnSub {
+            border-color: rgb(154, 229, 41);
+        }
+    </style>
+{% else %}
+    <style>
+        .calc {
+            color: red;
+            font-weight: bolder;
+            font-size: larger;
+        }
+        #bto, #btnSub {
+            background-color: red;
+        }
+        #cardSaldo, #btnSub {
+            border-color: red;
+        }
+    </style>
+{% endif %}
+
+<style>
+    .btn-secondary {
+        background-color: rgba(150, 0, 0, 0.55);
+        margin-left: 10px;
+        margin-top: 10px;
+    }
+    .formi {
+        margin-left: 10px;
+        /* max-width: 22%; */
+    }
+</style>
+<script>
+    let seleciona_mes = document.getElementById('mes')
+    
+    seleciona_mes.onchange = function() {
+        let mes = seleciona_mes.value;
+        alert(mes)
+}
+</script>
 {% endblock %}

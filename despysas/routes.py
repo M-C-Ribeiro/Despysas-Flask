@@ -65,38 +65,21 @@ def page_dashboard():
 @login_required
 def page_table():
     form = TabelaFiltrada()
+    form.meses.choices = [(0, "Todos")] + [(1, "Janeiro"), (2,"Fevereiro"), (3,"Março"), (4,"Abril"), (5,"Maio"), (6,"Junho"), (7,"Julho"), (8,"Agosto"), (9,"Setembro"), (10,"Outubro"), (11,"Novembro"), (12,"Dezembro")]
 
     if request.method == 'POST':
-        mes = Capitais.query.filter_by(meses=form.meses.data).first()   
-        print(mes)
-        capital = Capitais.query.filter(extract("month", Capitais.data) == mes).all() # consulta em todas as linhas da tabela Capitais
-        despesa = Despesas.query.all() # consulta em todas as linhas da tabela Despesas
-        return render_template("table.html", capital=capital, despesa=despesa, form=form) 
-
+        mes = form.meses.data
+        capitais = Capitais.query.filter(extract("month", Capitais.data) == mes).all()
+        despesa = Despesas.query.filter(extract("month", Despesas.data) == mes).all() # consulta em todas as linhas da tabela Despesas
+        return render_template("table.html", capital=capitais, despesa=despesa, form=form)
     
     capital = Capitais.query.all() # consulta em todas as linhas da tabela Capitais    
     despesa = Despesas.query.all() # consulta em todas as linhas da tabela Despesas
 
+    entrada = sum(x.valor for x in capital)
+    saida = sum(x.valor for x in despesa)
 
-    # lista = set([(mes.data.month) for mes in Capitais.query.all()]) # busca na
-    return render_template("table.html", capital=capital, despesa=despesa, form=form) # renderiza o arquivo table.html com os parametros
-
-@app.route('/filtro/<mes>')
-def filtro(mes):
-    linhas_filtradas = Capitais.query.filter_by(meses=mes).all()
-
-    lista_capitais = []
-
-    for capital in linhas_filtradas:
-        obj_capital = {}
-        obj_capital['id'] = capital.id
-        obj_capital['nome'] = capital.nome
-        obj_capital['valor'] = capital.valor
-
-        lista_capitais.append(obj_capital)
-
-    return jsonify({'capitais': lista_capitais})
-
+    return render_template("table.html", capital=capital, despesa=despesa, form=form, entrada=entrada, saida=saida) # renderiza o arquivo table.html com os parametros
 
 @app.route('/user') # decorator rota user
 def page_user():    
