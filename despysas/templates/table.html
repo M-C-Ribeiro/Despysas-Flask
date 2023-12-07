@@ -22,13 +22,13 @@
                   Total de Capital
                 </div>
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item"> {{ entrada }}</li>
+                  <li class="list-group-item">R$ {{ entrada }}</li>
                 </ul>
                 <div class="card-header">
                     Total de Despesas
                   </div>
                   <ul class="list-group list-group-flush">
-                    <li class="list-group-item"> {{ saida }}</li>
+                    <li class="list-group-item">R$ {{ saida }}</li>
                   </ul>
               </div>
         </div>
@@ -36,7 +36,7 @@
             <div class="card text-center" id="cardSaldo">
                 <div class="card-body">
                     <h5 class="card-title">Saldo atual:</h5>
-                    <p class="card-text calc">{{ entrada - saida }}</p>
+                    <p class="card-text calc">R$ {{ entrada - saida }}</p>
                     <a href="{{url_for('page_dashboard')}}" class="btn btn-primary" id="bto">Ver Gráficos</a>
                 </div>
             </div>
@@ -95,7 +95,7 @@
     </div>
 
 {% if entrada - saida > 0 %}
-    <style>
+    <style> 
         .calc {
             color: rgb(154, 229, 41);
             font-weight: bolder;

@@ -2,12 +2,11 @@ from despysas import app, db # aplicativo e banco de dados
 from flask import flash, jsonify, redirect, render_template, request, url_for # modulos Flask
 from sqlalchemy import extract
 from despysas.models import Capitais, Categorias, Despesas, Users # modelos das tabelas 
-from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, LoginForm, TabelaFiltrada # formularios para validacao
+from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, CapturaInvestimento, LoginForm, TabelaFiltrada # formularios para validacao
 from flask_login import login_required, login_user, logout_user # controle do login do usuário
 import pandas as pd # criação de dashboards
 import plotly.express as px # plotagem de gráficos
 import requests, json
-from dash import Dash, dcc, html, Input, Output
 import plotly.graph_objects as go
 
 @app.route('/') # decorator rota raiz
@@ -52,12 +51,6 @@ def page_dashboard():
 
     entrada_mes = fig.to_html(full_html=False)
 
-
-    # --------------- crescimento dos gastos e dos lucros ---------------
-    # # df = pd.concat
-    # fig = px.scatter(df_novo, x="mes", y=["capital", "despesas"], title="Capitais e Despesas")
-    # capitais_despesa = fig.to_html(full_html=False)
-
     return render_template("dashboard.html", figura_gastos_categoria=figura_gastos_categoria, entrada_mes=entrada_mes)#, capitais_despesa=capitais_despesa) 
 
 
@@ -70,7 +63,7 @@ def page_table():
     if request.method == 'POST':
         mes = form.meses.data
         capitais = Capitais.query.filter(extract("month", Capitais.data) == mes).all()
-        despesa = Despesas.query.filter(extract("month", Despesas.data) == mes).all() # consulta em todas as linhas da tabela Despesas
+        despesa = Despesas.query.filter(extract("month", Despesas.data) == mes).all()
         return render_template("table.html", capital=capitais, despesa=despesa, form=form)
     
     capital = Capitais.query.all() # consulta em todas as linhas da tabela Capitais    
@@ -80,10 +73,6 @@ def page_table():
     saida = sum(x.valor for x in despesa)
 
     return render_template("table.html", capital=capital, despesa=despesa, form=form, entrada=entrada, saida=saida) # renderiza o arquivo table.html com os parametros
-
-@app.route('/user') # decorator rota user
-def page_user():    
-    return render_template("user.html") # renderiza o arquivo user.html
 
 @app.route('/cadastro', methods=['GET', "POST"]) # decorator rota cadastro de usuario
 def page_cadastro():
@@ -180,11 +169,10 @@ def page_logout():
     flash("Usuário desconectado", category="info")
     return redirect(url_for("page_dashboard"))
 
-@app.route('/investimentos')
+@app.route('/investimentos', methods=['GET','POST'])
 def page_investimentos():
 
     token = "v5y2BDgq6LykAjCHuubjBe"
-    dash_app = Dash()
 
     # --------------- Gráfico de ações com maior crescimento ---------------
     url = f'https://brapi.dev/api/quote/list?sortBy=change&sortOrder=desc&limit=10&token={token}'
@@ -198,19 +186,18 @@ def page_investimentos():
                  title="Ações com maior crescimento")
     maior_crescimento = fig.to_html(full_html=False)
 
-    # --------------- Gráfico da taxa de inflação do Brasil ---------------
-    url = f'https://brapi.dev/api/v2/inflation?country=brazil&start=01/01/2022&end=01/01/2023&sortBy=date&sortOrder=asc&t'
-    req = requests.get(url)
-    res = json.loads(req.text)
-    df = pd.DataFrame(res['inflation'])
-    df['value'] = df['value'].astype(float)
+    # --------------- Gráfico de simulação de investimento ---------------
+    form = CapturaInvestimento()
+    form.acoes.choices = [(0,'Selecione uma categoria')]+[(indice + 1, valor) for indice, valor in enumerate(df['name'])]
+    
+    fig = go.Figure()
 
-    print(df['value'].dtypes)
-    fig = px.line(df, x="date", y="value")
-    fig.update_layout(title="Taxa de Inflação Jan. 2022 à Jan. 2023")
-    fig.update_xaxes(title_text="Meses", showgrid=True, gridwidth=1, gridcolor='lightgray', showline=True, linewidth=1, linecolor='black')
-    fig.update_yaxes(title_text="Taxa", showgrid=True, gridwidth=1, gridcolor='lightgray', showline=True, linewidth=1, linecolor='black')
-    fig.add_trace(go.Scatter(x = df['date'], y = df['value']))
-    inflacao = fig.to_html(full_html=False)
+    if request.method == 'POST':
 
-    return render_template('investimentos.html', maior_crescimento=maior_crescimento, inflacao=inflacao)
+        simulacao = fig.to_html(full_html=False)
+        return render_template('investimentos.html', maior_crescimento=maior_crescimento, simulacao=simulacao, form=form)
+
+    simulacao = fig.to_html(full_html=False)
+
+    
+    return render_template('investimentos.html', maior_crescimento=maior_crescimento, simulacao=simulacao, form=form)

@@ -7,8 +7,32 @@
 {% block content %}
     <h2 style="text-align: center;">Seção de Investimentos</h2>
     <hr>
-    <div class="col nav-item" style="height: max-content; gap: 2cm; display: flex; justify-content: center; align-items: center; max-width: 100%; ">
-        {{ maior_crescimento|safe }}
-        {{ inflacao|safe }}
+    <div class="row navbar">
+        <div class="col-sm-6 nav-item" style="height: max-content; gap: 2cm; display: flex; justify-content: center; align-items: center; max-width: 100%; ">
+            {{ maior_crescimento|safe }}
+        </div>
+        <div class="col-sm-6 nav-item" style="gap: 100px;" >
+            <form method="post">
+                {{ simulacao|safe }}
+
+                {{ form.hidden_tag() }}
+
+                {{ form.acoes.label() }}
+                {{ form.acoes(class="form-control", placeholder="Selecione a ação para simular")}}
+                
+                {{ form.investimento.label() }}
+                {{ form.investimento(class="form-control", placeholder="Informe um valor para simulação") }}
+
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-md btn-light")}}
+                </div>
+            </form>
+        </div>
     </div>
+
+    <style>
+        form {
+            max-width: 80%;
+        }
+    </style>
 {% endblock %}

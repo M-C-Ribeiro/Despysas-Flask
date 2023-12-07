@@ -7,6 +7,11 @@ from despysas.models import Users, Categorias
 class TabelaFiltrada(FlaskForm):
     meses = SelectField(label="Mês", choices=[]) 
 
+class CapturaInvestimento(FlaskForm):
+    acoes = SelectField(label="Ações", choices=[])
+    investimento = FloatField(label="Investimento")
+    submit = SubmitField(label="Simular")
+
 
 class CadastroFormUsuario(FlaskForm):
     def validate_username(self, check_user):
