@@ -17,15 +17,30 @@
 
                 {{ form.hidden_tag() }}
 
-                {{ form.acoes.label() }}
-                {{ form.acoes(class="form-control", placeholder="Selecione a ação para simular")}}
+                {% if msg == None %}
+                    <h5>Preencha as informações</h5>
+                    {{ form.acoes.label() }}
+                    {{ form.acoes(class="form-control", placeholder="Selecione a ação para simular")}}
                 
-                {{ form.investimento.label() }}
-                {{ form.investimento(class="form-control", placeholder="Informe um valor para simulação") }}
+                    {{ form.investimento.label() }}
+                    {{ form.investimento(class="form-control", placeholder="Informe um valor para simulação") }}
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-md btn-light")}}
+                    </div>
+                {% else %}
+                    <h5>Em um ano, investindo R${{form.investimento.data}} ao mês, acumulará R${{msg}}</h5>    
+                    <h6>Tendo investido no total R${{form.investimento.data * 12}}</h6>
+                    <h6>Lucro líquido R${{msg - (form.investimento.data * 12)}}</h6>
 
-                <div class="d-grid">
-                    {{ form.submit(class="btn btn-md btn-light")}}
-                </div>
+                    {{ form.acoes.label() }}
+                    {{ form.acoes(class="form-control", placeholder="Selecione a ação para simular")}}
+                
+                    {{ form.investimento.label() }}
+                    {{ form.investimento(class="form-control", placeholder="Informe um valor para simulação") }}
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-md btn-light")}}
+                    </div>
+                {% endif %}
             </form>
         </div>
     </div>

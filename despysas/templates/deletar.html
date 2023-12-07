@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Despysas
+{% endblock %}
+
+{% block content %}
+    <h2 style="text-align: center;">Cadastro de Capital</h2>
+    <hr>
+    <div class="container">
+        <form method="POST" class="form-register" style="color: #736222;">
+            {{ form.hidden_tag() }}
+
+            {{ form.nome.label() }}
+            {{ form.nome(class="form-control", placeholder="Informe um título")}}
+            
+            {{ form.valor.label() }}
+            {{ form.valor(class="form-control", placeholder="Informe o valor")}}
+
+            <div class="d-grid" style="padding-top: 50px;">
+                {{ form.submit(class="btn btn-md btn-light")}}
+            </div>
+        </form>
+    </div>
+{% endblock %}

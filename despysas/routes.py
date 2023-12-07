@@ -2,12 +2,13 @@ from despysas import app, db # aplicativo e banco de dados
 from flask import flash, jsonify, redirect, render_template, request, url_for # modulos Flask
 from sqlalchemy import extract
 from despysas.models import Capitais, Categorias, Despesas, Users # modelos das tabelas 
-from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, CapturaInvestimento, LoginForm, TabelaFiltrada # formularios para validacao
+from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, CapturaInvestimento, Deletar, LoginForm, TabelaFiltrada # formularios para validacao
 from flask_login import login_required, login_user, logout_user # controle do login do usuário
 import pandas as pd # criação de dashboards
 import plotly.express as px # plotagem de gráficos
 import requests, json
 import plotly.graph_objects as go
+import sqlite3 as sql
 
 @app.route('/') # decorator rota raiz
 @login_required
@@ -188,16 +189,54 @@ def page_investimentos():
 
     # --------------- Gráfico de simulação de investimento ---------------
     form = CapturaInvestimento()
-    form.acoes.choices = [(0,'Selecione uma categoria')]+[(indice + 1, valor) for indice, valor in enumerate(df['name'])]
+    form.acoes.choices = [('','Selecione uma categoria')]+[(indice + 1, valor) for indice, valor in enumerate(df['name'])]
     
     fig = go.Figure()
+    fig.update_layout(title="Simulação de Investimento Mensal")
+
+    msg = None
 
     if request.method == 'POST':
+        acao = int(form.acoes.data)
+        percentual = df['change'].iloc[acao-1]
+        entrada = form.investimento.data
+
+        x = [x for x in range(12)]
+        y = [entrada]
+
+        for i in range(1, 12):
+            y.append(round(y[i-1] + (entrada + (y[i-1] * percentual)/100), 2)) 
+        print(y)
+        
+        fig = px.line(x=x, y=y, 
+                      labels={'x':'Quantidade de meses investidos', 'y':'Acumulado'},
+                      text=y)
+        fig.update_traces(textposition="bottom right")
 
         simulacao = fig.to_html(full_html=False)
-        return render_template('investimentos.html', maior_crescimento=maior_crescimento, simulacao=simulacao, form=form)
+        msg = y[11]
+        return render_template('investimentos.html', maior_crescimento=maior_crescimento, simulacao=simulacao, form=form, msg=msg)
 
     simulacao = fig.to_html(full_html=False)
 
-    
-    return render_template('investimentos.html', maior_crescimento=maior_crescimento, simulacao=simulacao, form=form)
+    return render_template('investimentos.html', maior_crescimento=maior_crescimento, simulacao=simulacao, form=form, msg=msg)
+
+@app.route('/deletar/<int:number>', methods=['GET', 'POST'])
+def page_deletar(number):
+    form = Deletar()
+    form.tabela.choices = [('','Selecione uma opção'), (1,'Capitais'), (2,'Despesas'), (3,Categorias)]
+
+    if request.method == 'POST':
+        con = sql.connect(db)
+        cursor = con.cursor()
+            
+        cursor.execute("DELETE FROM SubmitClaim WHERE id = ?", (number,))
+
+        con.commit()
+        
+        con.close()
+        flash("Cadastro Deletado", category="info")
+        return redirect(url_for("page_table"))
+
+
+    return render_template('deletar.html', form=form)

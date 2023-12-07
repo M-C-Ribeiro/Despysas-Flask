@@ -1,17 +1,16 @@
 from flask import flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, IntegerField, FloatField, SelectField
-from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError 
+from wtforms.validators import Length, DataRequired, EqualTo, Email, InputRequired, ValidationError 
 from despysas.models import Users, Categorias
 
 class TabelaFiltrada(FlaskForm):
     meses = SelectField(label="Mês", choices=[]) 
 
 class CapturaInvestimento(FlaskForm):
-    acoes = SelectField(label="Ações", choices=[])
-    investimento = FloatField(label="Investimento")
+    acoes = SelectField(label="Ações", choices=[], validators=[InputRequired(message='Por favor, selecione uma opção')])
+    investimento = FloatField(label="Investimento", validators=[DataRequired()])
     submit = SubmitField(label="Simular")
-
 
 class CadastroFormUsuario(FlaskForm):
     def validate_username(self, check_user):
@@ -54,3 +53,8 @@ class LoginForm(FlaskForm):
     usuario = StringField(label="Usuário:", validators=[DataRequired()])
     senha = PasswordField(label="Senha:", validators=[DataRequired()])
     submit = SubmitField(label="Log In")
+
+class Deletar(FlaskForm):
+    tabela = SelectField(label="Tipo de Dado:", validators=[InputRequired(message='Por favor, selecione uma opção')])
+    id = IntegerField(label="ID do cadastro:", validators=[DataRequired()])
+    
