@@ -5,7 +5,7 @@ from wtforms.validators import Length, DataRequired, EqualTo, Email, InputRequir
 from despysas.models import Users, Categorias
 
 class TabelaFiltrada(FlaskForm):
-    meses = SelectField(label="Mês", choices=[]) 
+    meses = SelectField(label="Mês", choices=[], validators=[InputRequired(message='Por favor, selecione uma opção')]) 
 
 class CapturaInvestimento(FlaskForm):
     acoes = SelectField(label="Ações", choices=[], validators=[InputRequired(message='Por favor, selecione uma opção')])
@@ -49,12 +49,35 @@ class CadastroFormCategoria(FlaskForm):
     descricao = StringField(label="Descrição", validators=[Length(max=500), DataRequired()])
     submit = SubmitField(label="Cadastrar")
 
+class EditaFormCapital(FlaskForm):
+    # Nao necessita validacao maior, devido a nao serem valores unicos
+    id = IntegerField(label="ID do cadastro:", validators=[DataRequired()])
+    nome = StringField(label="Título", validators=[Length(max=30), DataRequired()])
+    valor = FloatField(label="Valor", validators=[DataRequired()])
+    submit = SubmitField(label="Atualizar")
+
+class EditaFormDespesa(FlaskForm):
+    # Nao necessita validacao maior, devido a nao serem valores unicos
+    id = IntegerField(label="ID do cadastro:", validators=[DataRequired()])
+    nome = StringField(label="Título", validators=[Length(max=30), DataRequired()])
+    valor = FloatField(label="Valor", validators=[DataRequired()])
+    descricao = StringField(label="Descrição", validators=[Length(max=500), DataRequired()])
+
+    categoria = SelectField(label="Selecione a Categoria", choices=[], validators=[DataRequired()])
+    submit = SubmitField(label="Atualizar")
+
+class EditaFormCategoria(FlaskForm):
+    id = IntegerField(label="ID do cadastro:", validators=[DataRequired()])
+    nome = StringField(label="Título", validators=[Length(max=30), DataRequired()])
+    descricao = StringField(label="Descrição", validators=[Length(max=500), DataRequired()])
+    submit = SubmitField(label="Atualizar")
+
 class LoginForm(FlaskForm):
     usuario = StringField(label="Usuário:", validators=[DataRequired()])
     senha = PasswordField(label="Senha:", validators=[DataRequired()])
     submit = SubmitField(label="Log In")
 
 class Deletar(FlaskForm):
-    tabela = SelectField(label="Tipo de Dado:", validators=[InputRequired(message='Por favor, selecione uma opção')])
     id = IntegerField(label="ID do cadastro:", validators=[DataRequired()])
-    
+    tabela = SelectField(label="Tipo de Dado:", choices=[], validators=[InputRequired(message='Por favor, selecione uma opção')])
+    submit = SubmitField(label="Excluir")

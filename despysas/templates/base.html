@@ -10,7 +10,7 @@
         {% endblock %}
     </title>
 </head>
-<body>
+<body style="max-width: 99%;">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">Despysas</a>
@@ -33,6 +33,10 @@
                     <a href="{{url_for('page_cadastro_categoria')}}" class="dropdown-item">Cadastrar Categoria</a>
                     <a href="{{url_for('page_cadastro_capital')}}" class="dropdown-item">Cadastrar Entrada</a>
                     <a href="{{url_for('page_cadastro_despesa')}}" class="dropdown-item">Cadastrar Despesa</a>
+                    <a href="{{url_for('page_deletar')}}" class="dropdown-item">Deletar Item</a>
+                    <a href="{{url_for('page_edita_categoria')}}" class="dropdown-item">Atualizar Categoria</a>
+                    <a href="{{url_for('page_edita_capital')}}" class="dropdown-item">Atualizar Entrada</a>
+                    <a href="{{url_for('page_edita_despesa')}}" class="dropdown-item">Atualizar Despesa</a>
                   </div>
                 </div>
                 <a class="nav-link" href="{{url_for('page_logout')}}">Sair</a>

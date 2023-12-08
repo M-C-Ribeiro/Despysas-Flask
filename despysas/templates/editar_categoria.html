@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Despysas
+{% endblock %}
+
+{% block content %}
+    <h2 style="text-align: center;">Atualização de Categoria</h2>
+    <hr>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <form method="POST" class="form-register" style="color: #736222;">
+                    {{ form.hidden_tag() }}
+                    
+                    {{ form.id.label() }}
+                    {{ form.id(class="form-control", placeholder="Informe o ID")}}
+                    
+                    {{ form.nome.label() }}
+                    {{ form.nome(class="form-control", placeholder="Informe um título")}}
+                    
+                    {{ form.descricao.label() }}
+                    {{ form.descricao(class="form-control", placeholder="Informe a descrição")}}
+                    
+                    <div class="d-grid" style="padding-top: 50px;">
+                        {{ form.submit(class="btn btn-md btn-light")}}
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-6">
+                <h4 style="margin-left: 10px; margin-top: 30px;">Categorias Cadastradas</h4>
+
+            <table class="table table-hover table-bordered table-light" style="max-width: fit-content;">
+                
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Descrição</th>
+                </thead>
+                <tbody>
+                    {% for item in categoria %}
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.nome}}</td>
+                        <td>{{item.descricao}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,14 +1,13 @@
 from despysas import app, db # aplicativo e banco de dados
-from flask import flash, jsonify, redirect, render_template, request, url_for # modulos Flask
+from flask import flash, redirect, render_template, request, url_for # modulos Flask
 from sqlalchemy import extract
 from despysas.models import Capitais, Categorias, Despesas, Users # modelos das tabelas 
-from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, CapturaInvestimento, Deletar, LoginForm, TabelaFiltrada # formularios para validacao
+from despysas.forms import CadastroFormUsuario, CadastroFormCategoria, CadastroFormCapital, CadastroFormDespesa, CapturaInvestimento, Deletar, EditaFormCapital, EditaFormCategoria, EditaFormDespesa, LoginForm, TabelaFiltrada # formularios para validacao
 from flask_login import login_required, login_user, logout_user # controle do login do usuário
 import pandas as pd # criação de dashboards
 import plotly.express as px # plotagem de gráficos
 import requests, json
 import plotly.graph_objects as go
-import sqlite3 as sql
 
 @app.route('/') # decorator rota raiz
 @login_required
@@ -59,7 +58,7 @@ def page_dashboard():
 @login_required
 def page_table():
     form = TabelaFiltrada()
-    form.meses.choices = [(0, "Todos")] + [(1, "Janeiro"), (2,"Fevereiro"), (3,"Março"), (4,"Abril"), (5,"Maio"), (6,"Junho"), (7,"Julho"), (8,"Agosto"), (9,"Setembro"), (10,"Outubro"), (11,"Novembro"), (12,"Dezembro")]
+    form.meses.choices = [('', "Todos")] + [(1, "Janeiro"), (2,"Fevereiro"), (3,"Março"), (4,"Abril"), (5,"Maio"), (6,"Junho"), (7,"Julho"), (8,"Agosto"), (9,"Setembro"), (10,"Outubro"), (11,"Novembro"), (12,"Dezembro")]
 
     if request.method == 'POST':
         mes = form.meses.data
@@ -184,7 +183,7 @@ def page_investimentos():
     fig = px.bar(df, x="name", y="change",
                  color="sector",
                  labels={"name":"Ativo", "change":"Crescimento"}, 
-                 title="Ações com maior crescimento")
+                 title="Ações com maior crescimento").update_layout(width=800, height=500)
     maior_crescimento = fig.to_html(full_html=False)
 
     # --------------- Gráfico de simulação de investimento ---------------
@@ -192,7 +191,7 @@ def page_investimentos():
     form.acoes.choices = [('','Selecione uma categoria')]+[(indice + 1, valor) for indice, valor in enumerate(df['name'])]
     
     fig = go.Figure()
-    fig.update_layout(title="Simulação de Investimento Mensal")
+    fig.update_layout(title="Simulação de Investimento Mensal", width=900, height=500)
 
     msg = None
 
@@ -210,7 +209,7 @@ def page_investimentos():
         
         fig = px.line(x=x, y=y, 
                       labels={'x':'Quantidade de meses investidos', 'y':'Acumulado'},
-                      text=y)
+                      text=y).update_layout(width=800, height=500)
         fig.update_traces(textposition="bottom right")
 
         simulacao = fig.to_html(full_html=False)
@@ -221,22 +220,81 @@ def page_investimentos():
 
     return render_template('investimentos.html', maior_crescimento=maior_crescimento, simulacao=simulacao, form=form, msg=msg)
 
-@app.route('/deletar/<int:number>', methods=['GET', 'POST'])
-def page_deletar(number):
+@app.route('/deletar', methods=['GET', 'POST'])
+def page_deletar():
     form = Deletar()
-    form.tabela.choices = [('','Selecione uma opção'), (1,'Capitais'), (2,'Despesas'), (3,Categorias)]
+    form.tabela.choices = [('','Selecione uma opção'), (1,'Capitais'), (2,'Despesas'), (3,"Categorias")]
+    tabela = form.tabela.data
 
     if request.method == 'POST':
-        con = sql.connect(db)
-        cursor = con.cursor()
-            
-        cursor.execute("DELETE FROM SubmitClaim WHERE id = ?", (number,))
-
-        con.commit()
         
-        con.close()
+        id = form.id.data
+
+        if tabela == '1':
+            item = Capitais.query.filter_by(id=id).first()
+        elif tabela == '2':
+            item = Despesas.query.filter_by(id=id).first()
+        else:
+            item = Categorias.query.filter_by(id=id).first()
+        
+        
+        db.session.delete(item)
+        db.session.commit()
         flash("Cadastro Deletado", category="info")
         return redirect(url_for("page_table"))
 
+    return render_template('deletar.html', capital=Capitais.query.all(), despesa=Despesas.query.all(), categoria=Categorias.query.all(), form=form)
 
-    return render_template('deletar.html', form=form)
+@app.route('/editar_categoria', methods=['GET', 'POST'])
+def page_edita_categoria():
+    form = EditaFormCategoria() # consulta informacoes do formulario de cadastro de capital
+    id = form.id.data
+    
+    if form.validate_on_submit(): # verificacao das entradas no formulario
+        item = Categorias.query.filter_by(id=id).first()
+        nome = form.nome.data
+        item.nome = nome
+        descricao = form.descricao.data
+        item.descricao = descricao
+        db.session.commit() # envia para o bd
+        return redirect(url_for('page_dashboard')) # retorna para a página dos dashboards
+    
+    return render_template("editar_categoria.html", categoria=Categorias.query.all(), form=form) # renderiza o formulario
+
+@app.route('/editar_capital', methods=['GET', 'POST']) # decorator rota cadastro de capital
+def page_edita_capital():
+    form = EditaFormCapital() # consulta informacoes do formulario de cadastro de capital
+    id = form.id.data
+    
+    if request.method == 'POST': # verificacao das entradas no formulario
+        item = Capitais.query.filter_by(id=id).first()
+        nome = form.nome.data
+        item.nome = nome
+        valor = form.valor.data
+        item.valor = valor
+        db.session.commit() #e envia para o bd
+        return redirect(url_for('page_dashboard')) # retorna para a página dos dashboards
+    
+    return render_template("editar_capital.html", capital=Capitais.query.all(), form=form) # renderiza o formulario
+
+@app.route('/editar_despesa', methods=['GET', 'POST'])
+def page_edita_despesa():
+    form = EditaFormDespesa() # consulta informacoes do formulario de cadastro de despesas
+    form.categoria.choices = [(0,'Selecione uma categoria')]+[(cat.id, cat.nome) for cat in Categorias.query.all()]
+    id = form.id.data
+
+    if form.validate_on_submit(): # verificacao das entradas no formulario
+        item = Despesas.query.filter_by(id=id).first()
+
+        nome = form.nome.data
+        item.nome = nome
+        valor = form.valor.data
+        item.valor = valor
+        descricao = form.descricao.data
+        item.descricao = descricao
+        categoria = form.categoria.data
+        item.categoria = categoria
+        db.session.commit() # envia para o bd
+        return redirect(url_for('page_dashboard')) # retorna para a página dos dashboards
+    
+    return render_template("editar_despesa.html", despesa=Despesas.query.all(), form=form) # renderiza o formulario

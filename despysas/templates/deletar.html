@@ -5,21 +5,92 @@
 {% endblock %}
 
 {% block content %}
-    <h2 style="text-align: center;">Cadastro de Capital</h2>
+    <h2 style="text-align: center;">Deletar Item</h2>
     <hr>
     <div class="container">
         <form method="POST" class="form-register" style="color: #736222;">
             {{ form.hidden_tag() }}
 
-            {{ form.nome.label() }}
-            {{ form.nome(class="form-control", placeholder="Informe um título")}}
-            
-            {{ form.valor.label() }}
-            {{ form.valor(class="form-control", placeholder="Informe o valor")}}
+            {{ form.tabela.label() }}
+            {{ form.tabela(class="form-control")}}
 
-            <div class="d-grid" style="padding-top: 50px;">
-                {{ form.submit(class="btn btn-md btn-light")}}
+            {{ form.id.label() }}
+            {{ form.id(class="form-control", placeholder="Informe o ID")}}
+            
+            <div class="d-grid" style="padding-top: 30px; padding-bottom: 50px;">
+                {{ form.submit(class="btn btn-md btn-danger")}}
             </div>
         </form>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h4 style="margin-left: 10px; margin-top: 10px;">Seu Capital</h4>
+            <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 60px;">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Data</th>
+                </thead>  
+                <tbody>
+                    {% for item in capital %}
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.nome}}</td>
+                        <td>{{item.valor}}</td>
+                        <td>{{item.data}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-6">
+            <h4 style="margin-left: 10px; margin-top: 10px;">Suas Despesas</h4>
+            <table class="table table-hover table-bordered table-light" style="max-width: 90%; text-align: center; margin-left: 55px;">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Data</th>
+                </thead>  
+                <tbody>
+                    {% for item in despesa %}
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.nome}}</td>
+                        <td>{{item.valor}}</td>
+                        <td>{{item.descricao}}</td>
+                        <td>{{item.categoria}}</td>
+                        <td>{{item.data}}</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row" style="display: flex; justify-content: center; text-align: center;">
+            <h4 style="margin-left: 10px; margin-top: 30px;">Categorias Cadastradas</h4>
+
+            <table class="table table-hover table-bordered table-light" style="max-width: fit-content;">
+                
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Descrição</th>
+                </thead>
+                <tbody>
+                    {% for item in categoria %}
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.nome}}</td>
+                        <td>{{item.descricao}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
     </div>
 {% endblock %}
